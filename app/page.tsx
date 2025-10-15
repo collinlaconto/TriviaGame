@@ -161,10 +161,38 @@ export default function Home() {
   const handlePlayAgain = async () => {
     try {
       const userId = getUserId()
+      const today = new Date().toISOString().split('T')[0]
+    
       console.log('Resetting answers for user:', userId)
     
-      // Simple approach: just refetch without the user's answers
-      // This works because fetchDailyTrivia will load fresh data without the answered state
+      // Get today's question IDs
+      const { data: dailyGame } = await supabase
+        .from('daily_games')
+        .select(`
+          daily_questions (question_id)
+        `)
+        .eq('game_date', today)
+        .single()
+
+      if (!dailyGame) return
+
+      const questionIds = dailyGame.daily_questions.map((dq: any) => dq.question_id)
+
+      // Delete user's answers (should work now with DELETE policy)
+      const { error, count } = await supabase
+        .from('user_answers')
+        .delete()
+        .eq('user_id', userId)
+        .in('question_id', questionIds)
+
+      if (error) {
+        console.error('Delete error:', error)
+        throw error
+      }
+
+      console.log(`Deleted ${count} answers`)
+
+      // Reset UI state
       setDailyTrivia(null)
       setError(null)
       setIsLoading(true)
@@ -172,7 +200,16 @@ export default function Home() {
     
     } catch (error) {
       console.error('Failed to reset game:', error)
-      setError('Failed to reset game. Please refresh the page.')
+      // Fallback to client-side reset
+      if (dailyTrivia) {
+        const resetQuestions = dailyTrivia.questions.map(q => ({
+          ...q,
+          isAnswered: false,
+          userAnswer: undefined,
+          isCorrect: undefined
+        }))
+        setDailyTrivia({ ...dailyTrivia, questions: resetQuestions })
+      }
     }
   }
 
