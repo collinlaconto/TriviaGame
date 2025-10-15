@@ -159,26 +159,39 @@ export default function Home() {
   }
 
   const handlePlayAgain = async () => {
-  try {
-    const today = new Date().toISOString().split('T')[0]
-    const userId = getUserId()
+    try {
+      const today = new Date().toISOString().split('T')[0]
+      const userId = getUserId()
     
-    // Delete user's answers for today
-    const { error } = await supabase
-      .from('user_answers')
-      .delete()
-      .eq('user_id', userId)
-      .gte('submitted_at', `${today}T00:00:00Z`)
-      .lte('submitted_at', `${today}T23:59:59Z`)
+      console.log('Resetting answers for user:', userId, 'on date:', today)
+    
+      // Delete user's answers for today
+      const { error, count } = await supabase
+        .from('user_answers')
+        .delete()
+        .eq('user_id', userId)
+        .gte('submitted_at', `${today}T00:00:00Z`)
+        .lte('submitted_at', `${today}T23:59:59Z`)
 
-    if (error) {
-      console.error('Error resetting answers:', error)
-    }
+      if (error) {
+        console.error('Error resetting answers:', error)
+        setError('Failed to reset game. Please refresh the page.')
+        return
+      }
 
-      // Refetch the daily trivia to reset the state
+      console.log(`Deleted ${count} answers`)
+
+      // Clear local state to force a refresh
+      setDailyTrivia(null)
+      setError(null)
+      setIsLoading(true)
+
+      // Refetch the daily trivia
       await fetchDailyTrivia()
+    
     } catch (error) {
       console.error('Failed to reset game:', error)
+      setError('Failed to reset game. Please refresh the page.')
     }
   }
 
