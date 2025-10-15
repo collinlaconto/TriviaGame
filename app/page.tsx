@@ -158,6 +158,31 @@ export default function Home() {
     }
   }
 
+  const handlePlayAgain = async () => {
+  try {
+    const today = new Date().toISOString().split('T')[0]
+    const userId = getUserId()
+    
+    // Delete user's answers for today
+    const { error } = await supabase
+      .from('user_answers')
+      .delete()
+      .eq('user_id', userId)
+      .gte('submitted_at', `${today}T00:00:00Z`)
+      .lte('submitted_at', `${today}T23:59:59Z`)
+
+    if (error) {
+      console.error('Error resetting answers:', error)
+    }
+
+      // Refetch the daily trivia to reset the state
+      await fetchDailyTrivia()
+    } catch (error) {
+      console.error('Failed to reset game:', error)
+    }
+  }
+
+
   const getCorrectCount = () => {
     return dailyTrivia?.questions.filter(q => q.isCorrect).length || 0
   }
@@ -238,8 +263,8 @@ export default function Home() {
           isOpen={allAnswered}
           correctCount={progressStats.correctCount}
           totalQuestions={progressStats.totalQuestions}
-          onPlayAgain={() => window.location.reload()}
-          onClose={() => {}} // Empty function since modal is only shown when all answered
+          onPlayAgain={handlePlayAgain}  // Updated to use the new function
+          onClose={() => {}}
         />
       </div>
     </div>

@@ -9,39 +9,23 @@ export default function CompletionModal({
 }: CompletionModalProps) {
   if (!isOpen) return null
 
-  const isPerfectScore = correctCount === totalQuestions
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          {isPerfectScore ? 'Perfect Score! 🎉' : 'Challenge Complete! ✅'}
-        </h2>
-        <div className="text-6xl mb-4">
-          {isPerfectScore ? '🏆' : '✅'}
-        </div>
-        <p className="text-lg text-gray-600 mb-2">Your Results:</p>
-        <p className="text-3xl font-bold text-green-600 mb-6">{correctCount} / {totalQuestions} Correct</p>
-        <p className="text-gray-600 mb-4">
-          {isPerfectScore 
-            ? "Amazing! You got every question right!" 
-            : `You answered ${correctCount} out of ${totalQuestions} questions correctly.`}
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Quiz Completed!</h2>
+        <p className="text-lg text-gray-700 mb-2">
+          You got {correctCount} out of {totalQuestions} correct.
         </p>
-        <div className="flex gap-4">
-          <button
-            onClick={onPlayAgain}
-            className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            Play Again
-          </button>
-          <button
-            onClick={onClose}
-            className="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors"
-          >
-            Close
-          </button>
-        </div>
+        <p className="text-gray-600 mb-4">
+          New questions available every day at midnight UTC!
+        </p>
+        <button
+          onClick={onPlayAgain}
+          className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors"
+        >
+          Play Again
+        </button>
       </div>
     </div>
-  )
+  );
 }
