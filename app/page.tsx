@@ -165,13 +165,34 @@ export default function Home() {
     
       console.log('Resetting answers for user:', userId, 'on date:', today)
     
-      // Delete user's answers for today
+      // First, let's find today's questions to get their IDs
+      const { data: dailyGame, error: gameError } = await supabase
+        .from('daily_games')
+        .select(`
+          id,
+          daily_questions (
+            question_id
+          )
+        `)
+        .eq('game_date', today)
+        .single()
+
+      if (gameError || !dailyGame) {
+        console.error('Error finding today\'s game:', gameError)
+        setError('Failed to reset game. Please refresh the page.')
+        return
+      }
+
+      // Get all question IDs for today
+      const questionIds = dailyGame.daily_questions.map((dq: any) => dq.question_id)
+      console.log('Today\'s question IDs:', questionIds)
+
+      // Delete user's answers for today's questions
       const { error, count } = await supabase
         .from('user_answers')
         .delete()
         .eq('user_id', userId)
-        .gte('submitted_at', `${today}T00:00:00Z`)
-        .lte('submitted_at', `${today}T23:59:59Z`)
+        .in('question_id', questionIds)
 
       if (error) {
         console.error('Error resetting answers:', error)
@@ -181,12 +202,10 @@ export default function Home() {
 
       console.log(`Deleted ${count} answers`)
 
-      // Clear local state to force a refresh
+      // Clear local state and refetch
       setDailyTrivia(null)
       setError(null)
       setIsLoading(true)
-
-      // Refetch the daily trivia
       await fetchDailyTrivia()
     
     } catch (error) {
