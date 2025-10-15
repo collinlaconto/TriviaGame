@@ -1,109 +1,98 @@
 'use client'
 
 import { useState } from 'react'
-import QuestionModal from './QuestionModal'
 import { DailyTriviaProps, TriviaQuestion } from '@/types'
 
 export default function DailyTrivia({ dailyTrivia, userId, onAnswerSubmit }: DailyTriviaProps) {
-  const [selectedQuestion, setSelectedQuestion] = useState<TriviaQuestion | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submissionResult, setSubmissionResult] = useState<any>(null)
-  const [localQuestions, setLocalQuestions] = useState<TriviaQuestion[]>(dailyTrivia.questions)
+  const [submitting, setSubmitting] = useState<string | null>(null)
+  const [results, setResults] = useState<{ [key: string]: any }>({})
 
-  const handleQuestionClick = (question: TriviaQuestion) => {
-    if (!question.isAnswered && !isSubmitting) {
-      setSelectedQuestion(question)
-      setSubmissionResult(null)
-    }
-  }
-
-  const handleSubmitAnswer = async (userAnswer: string) => {
-    if (!selectedQuestion) return
-
+  const handleSubmitAnswer = async (question: TriviaQuestion, answer: string) => {
+    if (!answer.trim()) return
+    
+    setSubmitting(question.id)
     try {
-      setIsSubmitting(true)
-      const result = await onAnswerSubmit(selectedQuestion.id, userAnswer, userId)
-      setSubmissionResult(result)
-
-      // Update local state with proper typing
-      setLocalQuestions((prev: TriviaQuestion[]) => 
-        prev.map((q: TriviaQuestion) => 
-          q.id === selectedQuestion.id 
-            ? { 
-                ...q, 
-                isAnswered: true, 
-                userAnswer,
-                isCorrect: result.isCorrect
-              }
-            : q
-        )
-      )
+      const result = await onAnswerSubmit(question.id, answer, userId)
+      setResults(prev => ({
+        ...prev,
+        [question.id]: result
+      }))
     } catch (error) {
-      console.error('Error submitting answer:', error)
+      console.error('Failed to submit answer:', error)
     } finally {
-      setIsSubmitting(false)
+      setSubmitting(null)
     }
   }
 
-  const handleCloseModal = () => {
-    setSelectedQuestion(null)
-    setSubmissionResult(null)
-  }
-
-  const getCategoryColor = (index: number): string => {
-    const colors = [
-      'bg-blue-500 hover:bg-blue-600',
-      'bg-green-500 hover:bg-green-600',
-      'bg-red-500 hover:bg-red-600',
-      'bg-purple-500 hover:bg-purple-600',
-      'bg-yellow-500 hover:bg-yellow-600',
-      'bg-pink-500 hover:bg-pink-600',
-      'bg-indigo-500 hover:bg-indigo-600',
-      'bg-teal-500 hover:bg-teal-600',
-      'bg-orange-500 hover:bg-orange-600'
-    ]
-    return colors[index % colors.length]
+  if (!dailyTrivia?.questions?.length) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 text-center">
+        <p className="text-gray-600">No questions available today.</p>
+      </div>
+    )
   }
 
   return (
-    <div>
-      {/* Categories Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        {localQuestions.map((question: TriviaQuestion, index: number) => (
-          <div
-            key={question.id}
-            className={`rounded-lg shadow-md transition-all duration-200 cursor-pointer transform hover:scale-105 ${
-              question.isAnswered 
-                ? question.isCorrect
-                  ? 'bg-green-500 cursor-not-allowed'
-                  : 'bg-red-500 cursor-not-allowed'
-                : getCategoryColor(index)
-            } text-white p-6 text-center`}
-            onClick={() => handleQuestionClick(question)}
-          >
-            <h3 className="text-xl font-bold mb-2">{question.category}</h3>
-            <p className="text-sm opacity-90 capitalize">{question.difficulty}</p>
-            {question.isAnswered && (
-              <div className="mt-2 text-sm">
-                <p className="truncate">Your answer: {question.userAnswer}</p>
-                <p className="font-semibold mt-1">
-                  {question.isCorrect ? '✓ Correct' : '✗ Incorrect'}
+    <div className="bg-white rounded-lg shadow-md p-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Today's Questions</h2>
+      
+      <div className="space-y-6">
+        {dailyTrivia.questions.map((question, index) => (
+          <div key={question.id} className="border border-gray-200 rounded-lg p-4">
+            <div className="flex justify-between items-start mb-3">
+              <h3 className="text-lg font-semibold text-gray-700">
+                Question {index + 1}
+              </h3>
+              <span className="text-sm bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                {question.category} • {question.difficulty}
+              </span>
+            </div>
+            
+            <p className="text-gray-800 mb-4 text-lg">{question.question}</p>
+            
+            {question.isAnswered ? (
+              <div className={`p-3 rounded ${
+                question.isCorrect 
+                  ? 'bg-green-100 text-green-700 border border-green-200' 
+                  : 'bg-red-100 text-red-700 border border-red-200'
+              }`}>
+                <p className="font-semibold">
+                  {question.isCorrect ? '✓ Correct!' : '✗ Incorrect'}
                 </p>
+                {question.userAnswer && (
+                  <p className="mt-1">Your answer: {question.userAnswer}</p>
+                )}
+                {!question.isCorrect && results[question.id]?.correctAnswer && (
+                  <p className="mt-1">Correct answer: {results[question.id].correctAnswer}</p>
+                )}
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Type your answer..."
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSubmitAnswer(question, e.currentTarget.value)
+                    }
+                  }}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  onClick={(e) => {
+                    const input = e.currentTarget.previousElementSibling as HTMLInputElement
+                    handleSubmitAnswer(question, input.value)
+                  }}
+                  disabled={submitting === question.id}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                  {submitting === question.id ? 'Submitting...' : 'Submit'}
+                </button>
               </div>
             )}
           </div>
         ))}
       </div>
-
-      {/* Question Modal */}
-      <QuestionModal
-        question={selectedQuestion}
-        isOpen={!!selectedQuestion}
-        isSubmitting={isSubmitting}
-        onClose={handleCloseModal}
-        onSubmit={handleSubmitAnswer}
-        submissionResult={submissionResult}
-      />
     </div>
   )
 }
