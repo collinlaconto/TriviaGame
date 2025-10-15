@@ -160,49 +160,11 @@ export default function Home() {
 
   const handlePlayAgain = async () => {
     try {
-      const today = new Date().toISOString().split('T')[0]
       const userId = getUserId()
+      console.log('Resetting answers for user:', userId)
     
-      console.log('Resetting answers for user:', userId, 'on date:', today)
-    
-      // First, let's find today's questions to get their IDs
-      const { data: dailyGame, error: gameError } = await supabase
-        .from('daily_games')
-        .select(`
-          id,
-          daily_questions (
-            question_id
-          )
-        `)
-        .eq('game_date', today)
-        .single()
-
-      if (gameError || !dailyGame) {
-        console.error('Error finding today\'s game:', gameError)
-        setError('Failed to reset game. Please refresh the page.')
-        return
-      }
-
-      // Get all question IDs for today
-      const questionIds = dailyGame.daily_questions.map((dq: any) => dq.question_id)
-      console.log('Today\'s question IDs:', questionIds)
-
-      // Delete user's answers for today's questions
-      const { error, count } = await supabase
-        .from('user_answers')
-        .delete()
-        .eq('user_id', userId)
-        .in('question_id', questionIds)
-
-      if (error) {
-        console.error('Error resetting answers:', error)
-        setError('Failed to reset game. Please refresh the page.')
-        return
-      }
-
-      console.log(`Deleted ${count} answers`)
-
-      // Clear local state and refetch
+      // Simple approach: just refetch without the user's answers
+      // This works because fetchDailyTrivia will load fresh data without the answered state
       setDailyTrivia(null)
       setError(null)
       setIsLoading(true)
