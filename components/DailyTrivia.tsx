@@ -5,26 +5,26 @@ import { DailyTriviaProps, TriviaQuestion } from '@/types'
 
 // Color scheme for different categories
 const categoryColors: { [key: string]: string } = {
-  'Science': 'bg-blue-500',
-  'History': 'bg-amber-500',
-  'Geography': 'bg-teal-500',
-  'Literature': 'bg-purple-500',
-  'Sports': 'bg-red-500',
-  'Entertainment': 'bg-pink-500',
-  'Art': 'bg-indigo-500',
-  'Music': 'bg-cyan-500',
-  'Technology': 'bg-slate-500',
+  'Science': 'bg-blue-600',
+  'History': 'bg-orange-500',
+  'Geography': 'bg-emerald-600',
+  'Literature': 'bg-purple-600',
+  'Sports': 'bg-red-600',
+  'Entertainment': 'bg-fuchsia-500',
+  'Art': 'bg-violet-600',
+  'Music': 'bg-yellow-500',
+  'Technology': 'bg-slate-700',
   'Nature': 'bg-lime-600',
 }
 
 // Fallback colors for uncategorized questions
 const fallbackColors = [
-  'bg-blue-500',
-  'bg-amber-500',
-  'bg-teal-500',
-  'bg-purple-500',
-  'bg-red-500',
-  'bg-pink-500',
+  'bg-blue-600',
+  'bg-orange-500',
+  'bg-emerald-600',
+  'bg-purple-600',
+  'bg-red-600',
+  'bg-fuchsia-500',
 ]
 
 export default function DailyTrivia({ dailyTrivia, userId, onAnswerSubmit }: DailyTriviaProps) {
@@ -79,7 +79,9 @@ export default function DailyTrivia({ dailyTrivia, userId, onAnswerSubmit }: Dai
               {!isSelected && (
                 <button
                   onClick={() => setSelectedQuestion(question.id)}
-                  className={`w-full h-40 ${colorClass} rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-white p-6 flex flex-col items-center justify-center cursor-pointer`}
+                  className={`w-full h-40 ${colorClass} rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-white p-6 flex flex-col items-center justify-center cursor-pointer ${
+                    question.isAnswered ? 'opacity-50' : ''
+                  }`}
                 >
                   <div className="text-center">
                     <div className="text-sm font-semibold opacity-90 mb-2">
@@ -89,8 +91,8 @@ export default function DailyTrivia({ dailyTrivia, userId, onAnswerSubmit }: Dai
                       {question.category}
                     </div>
                     {question.isAnswered && (
-                      <div className="mt-3 text-sm bg-white bg-opacity-20 rounded px-3 py-1 inline-block">
-                        {question.isCorrect ? '✓ Answered' : '✗ Answered'}
+                      <div className="mt-3 text-sm bg-white bg-opacity-30 rounded px-3 py-1 inline-block">
+                        {question.isCorrect ? '✓ Correct' : '✗ Incorrect'}
                       </div>
                     )}
                   </div>
@@ -99,10 +101,14 @@ export default function DailyTrivia({ dailyTrivia, userId, onAnswerSubmit }: Dai
 
               {/* Question Card (Back) */}
               {isSelected && (
-                <div className="border-2 border-gray-300 rounded-lg p-4 bg-white shadow-lg min-h-40 flex flex-col">
+                <div className={`border-2 rounded-lg p-4 bg-white shadow-lg min-h-40 flex flex-col ${
+                  question.isAnswered ? 'border-gray-300' : 'border-gray-300'
+                }`}>
                   {/* Header with category and close button */}
                   <div className="flex justify-between items-center mb-3">
-                    <span className={`text-xs ${colorClass} text-white px-3 py-1 rounded font-semibold`}>
+                    <span className={`text-xs ${colorClass} text-white px-3 py-1 rounded font-semibold ${
+                      question.isAnswered ? 'opacity-50' : ''
+                    }`}>
                       {question.category}
                     </span>
                     <button
@@ -120,19 +126,17 @@ export default function DailyTrivia({ dailyTrivia, userId, onAnswerSubmit }: Dai
                   
                   {/* Answer Section */}
                   {question.isAnswered ? (
-                    <div className={`p-3 rounded ${
-                      question.isCorrect 
-                        ? 'bg-green-100 text-green-700 border border-green-200' 
-                        : 'bg-red-100 text-red-700 border border-red-200'
-                    }`}>
-                      <p className="font-semibold text-sm">
+                    <div className="text-center py-2">
+                      <p className={`font-semibold text-lg ${
+                        question.isCorrect ? 'text-green-600' : 'text-red-600'
+                      }`}>
                         {question.isCorrect ? '✓ Correct!' : '✗ Incorrect'}
                       </p>
                       {question.userAnswer && (
-                        <p className="mt-1 text-sm">Your answer: {question.userAnswer}</p>
+                        <p className="mt-2 text-sm text-gray-700">Your answer: <span className="font-medium">{question.userAnswer}</span></p>
                       )}
                       {!question.isCorrect && results[question.id]?.correctAnswer && (
-                        <p className="mt-1 text-sm">Correct: {results[question.id].correctAnswer}</p>
+                        <p className="mt-1 text-sm text-gray-700">Correct answer: <span className="font-medium">{results[question.id].correctAnswer}</span></p>
                       )}
                     </div>
                   ) : (
