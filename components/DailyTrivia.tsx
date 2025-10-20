@@ -7,21 +7,21 @@ import { DailyTriviaProps, TriviaQuestion } from '@/types'
 const categoryColors: { [key: string]: string } = {
   'Science': 'bg-blue-500',
   'History': 'bg-amber-500',
-  'Geography': 'bg-green-500',
+  'Geography': 'bg-teal-500',
   'Literature': 'bg-purple-500',
   'Sports': 'bg-red-500',
   'Entertainment': 'bg-pink-500',
   'Art': 'bg-indigo-500',
   'Music': 'bg-cyan-500',
   'Technology': 'bg-slate-500',
-  'Nature': 'bg-emerald-500',
+  'Nature': 'bg-lime-600',
 }
 
 // Fallback colors for uncategorized questions
 const fallbackColors = [
   'bg-blue-500',
   'bg-amber-500',
-  'bg-green-500',
+  'bg-teal-500',
   'bg-purple-500',
   'bg-red-500',
   'bg-pink-500',
@@ -145,7 +145,7 @@ export default function DailyTrivia({ dailyTrivia, userId, onAnswerSubmit }: Dai
                             handleSubmitAnswer(question, e.currentTarget.value)
                           }
                         }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-gray-50 text-gray-900"
                         autoFocus
                       />
                       <button
