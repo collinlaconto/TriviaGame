@@ -36,38 +36,45 @@ export default function DailyTrivia({ dailyTrivia, userId, onAnswerSubmit }: Dai
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Today's Questions</h2>
       
-      <div className="space-y-6">
+      {/* CHANGED: Replaced space-y-6 with grid layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {dailyTrivia.questions.map((question, index) => (
-          <div key={question.id} className="border border-gray-200 rounded-lg p-4">
+          <div 
+            key={question.id} 
+            className="border border-gray-200 rounded-lg p-4 flex flex-col h-full"
+          >
+            {/* Question Header */}
             <div className="flex justify-between items-start mb-3">
               <h3 className="text-lg font-semibold text-gray-700">
-                Question {index + 1}
+                Q{index + 1}
               </h3>
-              <span className="text-sm bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                {question.category} • {question.difficulty}
+              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                {question.category}
               </span>
             </div>
             
-            <p className="text-gray-800 mb-4 text-lg">{question.question}</p>
+            {/* Question Text */}
+            <p className="text-gray-800 mb-4 flex-grow">{question.question}</p>
             
+            {/* Answer Section */}
             {question.isAnswered ? (
               <div className={`p-3 rounded ${
                 question.isCorrect 
                   ? 'bg-green-100 text-green-700 border border-green-200' 
                   : 'bg-red-100 text-red-700 border border-red-200'
               }`}>
-                <p className="font-semibold">
+                <p className="font-semibold text-sm">
                   {question.isCorrect ? '✓ Correct!' : '✗ Incorrect'}
                 </p>
                 {question.userAnswer && (
-                  <p className="mt-1">Your answer: {question.userAnswer}</p>
+                  <p className="mt-1 text-sm">Your answer: {question.userAnswer}</p>
                 )}
                 {!question.isCorrect && results[question.id]?.correctAnswer && (
-                  <p className="mt-1">Correct answer: {results[question.id].correctAnswer}</p>
+                  <p className="mt-1 text-sm">Correct: {results[question.id].correctAnswer}</p>
                 )}
               </div>
             ) : (
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2">
                 <input
                   type="text"
                   placeholder="Type your answer..."
@@ -76,7 +83,7 @@ export default function DailyTrivia({ dailyTrivia, userId, onAnswerSubmit }: Dai
                       handleSubmitAnswer(question, e.currentTarget.value)
                     }
                   }}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 />
                 <button
                   onClick={(e) => {
@@ -84,7 +91,7 @@ export default function DailyTrivia({ dailyTrivia, userId, onAnswerSubmit }: Dai
                     handleSubmitAnswer(question, input.value)
                   }}
                   disabled={submitting === question.id}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
                 >
                   {submitting === question.id ? 'Submitting...' : 'Submit'}
                 </button>
