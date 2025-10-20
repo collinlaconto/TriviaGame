@@ -91,7 +91,7 @@ export default function DailyTrivia({ dailyTrivia, userId, onAnswerSubmit }: Dai
                       {question.category}
                     </div>
                     {question.isAnswered && (
-                      <div className="mt-3 text-sm bg-white bg-opacity-30 rounded px-3 py-1 inline-block">
+                      <div className="mt-3 text-sm text-gray-700 bg-white bg-opacity-30 rounded px-3 py-1 inline-block">
                         {question.isCorrect ? '✓ Correct' : '✗ Incorrect'}
                       </div>
                     )}
