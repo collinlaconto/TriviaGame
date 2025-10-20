@@ -11,7 +11,7 @@ import ProgressStats from '@/components/ProgressStats'
 import CompletionModal from '@/components/CompletionModal'
 // Modal showed when all questions have been answered
 import { DailyTrivia as DailyTriviaType, SubmissionResult, ProgressStats as ProgressStatsType, TriviaQuestion } from '@/types'
-// Tyepscript type definitions
+// Typescript type definitions
 import { createClient } from '@/lib/supabase/client'
 // Supabase client for database operations
 import { getUserId } from '@/lib/user-id'

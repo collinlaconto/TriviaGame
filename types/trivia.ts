@@ -1,3 +1,5 @@
+// This file handles the types that we use and export
+
 export interface TriviaQuestion {
   id: string
   category: string

@@ -8,7 +8,7 @@ export default function ProgressStats({ stats }: ProgressStatsProps) {
     <div className="space-y-8">
       {/* Header Stats */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-2">Daily Trivia Challenge</h1>
+        <h1 className="text-4xl font-bold text-gray-800 mb-2">Goose Trivia</h1>
         <p className="text-gray-600">Can you answer all {totalQuestions} questions correctly?</p>
         <div className="mt-4 flex justify-between items-center bg-white rounded-lg shadow-sm p-4">
           <div className="text-left">
