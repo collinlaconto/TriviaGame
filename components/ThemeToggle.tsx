@@ -1,14 +1,30 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useTheme } from './ThemeProvider'
 
 /**
  * ThemeToggle Component
  * A simple button that switches between light and dark mode
+ * Displays text only (no icons) showing the current theme
  */
 export default function ThemeToggle() {
+  // State to track if component has mounted on client
+  const [mounted, setMounted] = useState(false)
+  
   // Get the current theme and toggle function from our ThemeProvider
   const { theme, toggleTheme } = useTheme()
+
+  // Set mounted to true after component mounts on client
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Don't render anything until mounted on client
+  // This prevents server-side rendering issues
+  if (!mounted) {
+    return null
+  }
 
   return (
     <button
