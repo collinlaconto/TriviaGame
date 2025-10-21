@@ -51,7 +51,7 @@ export default function Home() {
   useEffect(() => {
     // useEffect hook runs when component mounts (empty dependency array [])
     fetchDailyTrivia()
-    // Fetch dauly trivia when component loads
+    // Fetch daily trivia when component loads
   }, [])
   // Empty array means this effect runs only once after initial render
 

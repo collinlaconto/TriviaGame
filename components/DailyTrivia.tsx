@@ -3,28 +3,26 @@
 import { useState } from 'react'
 import { DailyTriviaProps, TriviaQuestion } from '@/types'
 
-// Color scheme for different categories
-const categoryColors: { [key: string]: string } = {
-  'Science': 'bg-blue-600',
-  'History': 'bg-orange-500',
-  'Geography': 'bg-emerald-600',
-  'Literature': 'bg-purple-600',
-  'Sports': 'bg-red-600',
-  'Entertainment': 'bg-fuchsia-500',
-  'Art': 'bg-violet-600',
-  'Music': 'bg-yellow-500',
-  'Technology': 'bg-slate-700',
-  'Nature': 'bg-lime-600',
-}
-
-// Fallback colors for uncategorized questions
-const fallbackColors = [
+// Color palette for cards - each question gets a unique color based on its position
+const cardColors = [
   'bg-blue-600',
   'bg-orange-500',
   'bg-emerald-600',
   'bg-purple-600',
   'bg-red-600',
   'bg-fuchsia-500',
+  'bg-violet-600',
+  'bg-yellow-500',
+  'bg-slate-700',
+  'bg-lime-600',
+  'bg-cyan-600',
+  'bg-rose-600',
+  'bg-indigo-600',
+  'bg-amber-600',
+  'bg-teal-600',
+  'bg-pink-600',
+  'bg-sky-600',
+  'bg-green-600',
 ]
 
 export default function DailyTrivia({ dailyTrivia, userId, onAnswerSubmit }: DailyTriviaProps) {
@@ -49,8 +47,9 @@ export default function DailyTrivia({ dailyTrivia, userId, onAnswerSubmit }: Dai
     }
   }
 
-  const getCategoryColor = (category: string, index: number): string => {
-    return categoryColors[category] || fallbackColors[index % fallbackColors.length]
+  // Get color based on index position, not category
+  const getCardColor = (index: number): string => {
+    return cardColors[index % cardColors.length]
   }
 
   if (!dailyTrivia?.questions?.length) {
@@ -68,7 +67,7 @@ export default function DailyTrivia({ dailyTrivia, userId, onAnswerSubmit }: Dai
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {dailyTrivia.questions.map((question, index) => {
           const isSelected = selectedQuestion === question.id
-          const colorClass = getCategoryColor(question.category, index)
+          const colorClass = getCardColor(index)
           
           return (
             <div 
