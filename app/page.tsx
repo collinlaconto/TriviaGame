@@ -350,10 +350,10 @@ export default function Home() {
   if (isLoading) {
     // Loading state UI
     return (
-      <div className="min-h-screen bg-gray-100 flex justify-center items-center">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex justify-center items-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading today's trivia...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading today's trivia...</p>
         </div>
       </div>
     )
@@ -364,11 +364,11 @@ export default function Home() {
     // Error state UI
     // Only show if no trivia data exists
     return (
-      <div className="min-h-screen bg-gray-100 flex justify-center items-center">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex justify-center items-center">
         <div className="text-center">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Something went wrong</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">Something went wrong</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
           <button
             onClick={fetchDailyTrivia}
             className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
@@ -384,9 +384,9 @@ export default function Home() {
   if (!dailyTrivia) {
     // No trivia available state
     return (
-      <div className="min-h-screen bg-gray-100 flex justify-center items-center">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex justify-center items-center">
         <div className="text-center">
-          <p className="text-gray-600">No trivia available today.</p>
+          <p className="text-gray-600 dark:text-gray-400">No trivia available today.</p>
         </div>
       </div>
     )
@@ -406,13 +406,13 @@ export default function Home() {
     // Daily Trivia: Main trivia component with questions
     // Completion Modal: Shows when all questions are answered
 
-    <div className="min-h-screen bg-gray-100 py-8">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-8">
       <div className="max-w-6xl mx-auto px-4">
         <ProgressStats stats={progressStats} />
 
         {error && (
-          <div className="mb-4 p-4 bg-yellow-100 border border-yellow-400 rounded-lg">
-            <p className="text-yellow-800">{error}</p>
+          <div className="mb-4 p-4 bg-yellow-100 dark:bg-yellow-900 border border-yellow-400 dark:border-yellow-600 rounded-lg">
+            <p className="text-yellow-800 dark:text-yellow-200">{error}</p>
           </div>
         )}
 

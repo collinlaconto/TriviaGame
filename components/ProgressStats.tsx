@@ -8,20 +8,20 @@ export default function ProgressStats({ stats }: ProgressStatsProps) {
     <div className="space-y-8">
       {/* Header Stats */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-2">Goose Trivia</h1>
-        <p className="text-gray-600">Can you answer all {totalQuestions} questions correctly?</p>
-        <div className="mt-4 flex justify-between items-center bg-white rounded-lg shadow-sm p-4">
+        <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">Goose Trivia</h1>
+        <p className="text-gray-600 dark:text-gray-400">Can you answer all {totalQuestions} questions correctly?</p>
+        <div className="mt-4 flex justify-between items-center bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
           <div className="text-left">
-            <p className="text-sm text-gray-500">Date</p>
-            <p className="font-semibold">{new Date(date).toLocaleDateString()}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Date</p>
+            <p className="font-semibold text-gray-800 dark:text-gray-200">{new Date(date).toLocaleDateString()}</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-gray-500">Correct Answers</p>
-            <p className="text-2xl font-bold text-green-600">{correctCount} / {totalQuestions}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Correct Answers</p>
+            <p className="text-2xl font-bold text-green-600 dark:text-green-400">{correctCount} / {totalQuestions}</p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-gray-500">Progress</p>
-            <p className="font-semibold">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Progress</p>
+            <p className="font-semibold text-gray-800 dark:text-gray-200">
               {answeredCount} / {totalQuestions}
             </p>
           </div>
@@ -29,14 +29,14 @@ export default function ProgressStats({ stats }: ProgressStatsProps) {
       </div>
 
       {/* Progress Bar */}
-      <div className="bg-white rounded-lg shadow-sm p-4">
-        <div className="flex justify-between text-sm text-gray-600 mb-2">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+        <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
           <span>Your Progress</span>
           <span>{progressPercentage}%</span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
           <div 
-            className="bg-green-500 h-2 rounded-full transition-all duration-300"
+            className="bg-green-500 dark:bg-green-400 h-2 rounded-full transition-all duration-300"
             style={{ width: `${progressPercentage}%` }}
           ></div>
         </div>
