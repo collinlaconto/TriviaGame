@@ -408,10 +408,6 @@ export default function Home() {
     
 
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-8">
-      <div className="fixed top-20 right-4 p-4 bg-white dark:bg-black text-black dark:text-white border-2 border-red-500 z-50">
-        Test: I should change colors
-      </div>
-
       <div className="max-w-6xl mx-auto px-4">
         <ProgressStats stats={progressStats} />
 
