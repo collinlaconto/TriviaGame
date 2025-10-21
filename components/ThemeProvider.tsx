@@ -2,69 +2,78 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 
+// Define the two possible theme values
 type Theme = 'light' | 'dark'
 
+// Define what data the ThemeContext will provide to components
 type ThemeContextType = {
-  theme: Theme
-  toggleTheme: () => void
+  theme: Theme              // The current theme ('light' or 'dark')
+  toggleTheme: () => void   // Function to switch between themes
 }
 
+// Create a Context to share theme data across all components
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
+/**
+ * ThemeProvider Component
+ * Wraps the entire app to provide theme functionality to all child components
+ * Handles: loading saved theme, detecting system preference, saving changes, and updating the DOM
+ */
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  // State to track the current theme (defaults to 'light')
   const [theme, setTheme] = useState<Theme>('light')
+  
+  // State to track if the component has mounted (rendered on the client)
+  // This prevents hydration errors in Next.js
   const [mounted, setMounted] = useState(false)
 
+  // Load the user's saved theme preference or detect their system preference
   useEffect(() => {
-    console.log('ThemeProvider mounted')
     setMounted(true)
     
+    // Try to get the saved theme from browser's localStorage
     const savedTheme = localStorage.getItem('theme') as Theme | null
-    console.log('Saved theme from localStorage:', savedTheme)
     
     if (savedTheme) {
+      // If user previously saved a preference, use it
       setTheme(savedTheme)
-      console.log('Using saved theme:', savedTheme)
     } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      // Otherwise, check if their operating system prefers dark mode
       setTheme('dark')
-      console.log('Using system preference: dark')
-    } else {
-      console.log('Using default: light')
     }
   }, [])
 
+  // Apply the theme to the HTML document and save it to localStorage
   useEffect(() => {
     if (mounted) {
-      console.log('Applying theme:', theme)
       const root = document.documentElement
       
+      // Only manage the 'dark' class - Tailwind doesn't need 'light'
       if (theme === 'dark') {
         root.classList.add('dark')
-        console.log('Added dark class to html element')
       } else {
         root.classList.remove('dark')
-        console.log('Removed dark class from html element')
       }
       
+      // Save the theme to localStorage so it persists across browser sessions
       localStorage.setItem('theme', theme)
-      console.log('Saved theme to localStorage:', theme)
-      console.log('Current HTML classes:', root.className)
     }
   }, [theme, mounted])
 
+  /**
+   * toggleTheme Function
+   * Switches between light and dark mode
+   */
   const toggleTheme = () => {
-    console.log('toggleTheme called, current theme:', theme)
-    setTheme(prevTheme => {
-      const newTheme = prevTheme === 'light' ? 'dark' : 'light'
-      console.log('Setting new theme:', newTheme)
-      return newTheme
-    })
+    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light')
   }
 
+  // Don't render until mounted to prevent flash of unstyled content
   if (!mounted) {
     return <>{children}</>
   }
 
+  // Provide theme and toggleTheme to all child components via Context
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
       {children}
@@ -72,10 +81,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
+/**
+ * useTheme Hook
+ * Custom hook that any component can call to access theme and toggleTheme
+ * Example usage: const { theme, toggleTheme } = useTheme()
+ */
 export function useTheme() {
   const context = useContext(ThemeContext)
+  
   if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider')
   }
+  
   return context
 }
