@@ -54,12 +54,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       // Get the root HTML element (<html>)
       const root = document.documentElement
       
-      // Remove any existing theme classes
-      root.classList.remove('light', 'dark')
-      
-      // Add the current theme as a class to <html>
-      // This enables Tailwind's dark: prefix to work
-      root.classList.add(theme)
+      // FIXED: Only add/remove 'dark' class, not 'light'
+      // Tailwind's dark mode works by checking for 'dark' class presence
+      if (theme === 'dark') {
+        root.classList.add('dark')
+      } else {
+        root.classList.remove('dark')
+      }
       
       // Save the theme to localStorage so it persists across browser sessions
       localStorage.setItem('theme', theme)
