@@ -11,9 +11,6 @@ import { useTheme } from './ThemeProvider'
 export default function ThemeToggle() {
   // State to track if component has mounted on client
   const [mounted, setMounted] = useState(false)
-  
-  // Get the current theme and toggle function from our ThemeProvider
-  const { theme, toggleTheme } = useTheme()
 
   // Set mounted to true after component mounts on client
   useEffect(() => {
@@ -25,6 +22,13 @@ export default function ThemeToggle() {
   if (!mounted) {
     return null
   }
+
+  // Only call useTheme after we know we're on the client
+  return <ThemeToggleButton />
+}
+
+function ThemeToggleButton() {
+  const { theme, toggleTheme } = useTheme()
 
   return (
     <button
