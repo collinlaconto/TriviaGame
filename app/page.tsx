@@ -181,8 +181,24 @@ export default function Home() {
         // If the question is not found, display an error
       }
 
-      const isCorrect = question.answer.trim().toLowerCase() === userAnswer.trim().toLowerCase()
-      // Compare user's answer with correct answer (case and space insensitive)
+      // Add the helper functions at the top of your file (outside the component)
+      function normalizeAnswer(answer: string): string {
+        let normalized = answer.trim()
+        normalized = normalized.toLowerCase()
+        normalized = normalized.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        normalized = normalized.replace(/[^\w\s]/g, '')
+        normalized = normalized.replace(/^(the|a|an)\s+/i, '')
+        normalized = normalized.replace(/s$/, '')
+        normalized = normalized.replace(/\s+/g, ' ').trim()
+        return normalized
+      }
+
+function answersMatch(userAnswer: string, correctAnswer: string): boolean {
+  return normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer)
+}
+
+// Then in handleAnswerSubmit, use:
+const isCorrect = answersMatch(userAnswer, question.answer)
       
       const { error: submitError } = await supabase
       // Save the user's submission to the database
