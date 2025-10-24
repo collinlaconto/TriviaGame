@@ -249,14 +249,13 @@ export default function Home() {
     try {
         setIsLoading(true)
         setError(null)
-        const { data: questions, error: gameError} = await supabase
-            .from('questions')
-            .select('id, question, category, difficulty')
-            //.order('random()')
-            .limit(12)
-        if (gameError) {
-            throw new Error('Failed to load trivia')
+        const { data: questions, error: questionError } = await supabase
+          .rpc('get_random_questions', { question_count: 12 })
+
+        if (questionError) {
+          throw new Error('Failed to load trivia')
         }
+
         setUnlimitedTrivia(questions)
     } catch (error: any) {
         setError(error.message)
