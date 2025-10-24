@@ -10,11 +10,6 @@ export interface TriviaQuestion {
   isCorrect?: boolean
 }
 
-export interface DailyTrivia {
-  date: string
-  questions: TriviaQuestion[]
-}
-
 export interface SubmissionResult {
   isCorrect: boolean
   correctAnswer?: string

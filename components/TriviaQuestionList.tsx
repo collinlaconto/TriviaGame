@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { DailyTriviaProps, TriviaQuestion } from '@/types'
+import { TriviaQuestion, TriviaQuestionProps } from '@/types'
 
 // Color palette for cards - each question gets a unique color based on its position
 const cardColors = [
@@ -25,7 +25,7 @@ const cardColors = [
   'bg-green-600',
 ]
 
-export default function DailyTrivia({ dailyTrivia, userId, onAnswerSubmit }: DailyTriviaProps) {
+export default function TriviaQuestionList({ questions, userId, onAnswerSubmit }: TriviaQuestionProps) {
   const [submitting, setSubmitting] = useState<string | null>(null)
   const [results, setResults] = useState<{ [key: string]: any }>({})
   const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null)
@@ -52,7 +52,7 @@ export default function DailyTrivia({ dailyTrivia, userId, onAnswerSubmit }: Dai
     return cardColors[index % cardColors.length]
   }
 
-  if (!dailyTrivia?.questions?.length) {
+  if (!questions?.length) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 text-center">
         <p className="text-gray-600 dark:text-gray-400">No questions available today.</p>
@@ -62,10 +62,9 @@ export default function DailyTrivia({ dailyTrivia, userId, onAnswerSubmit }: Dai
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Today's Questions</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {dailyTrivia.questions.map((question, index) => {
+        {questions.map((question, index) => {
           const isSelected = selectedQuestion === question.id
           const colorClass = getCardColor(index)
           
