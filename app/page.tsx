@@ -252,7 +252,7 @@ export default function Home() {
         const { data: questions, error: gameError} = await supabase
             .from('questions')
             .select('id, question, category, difficulty')
-            .order('random()')
+            //.order('random()')
             .limit(12)
         if (gameError) {
             throw new Error('Failed to load trivia')
