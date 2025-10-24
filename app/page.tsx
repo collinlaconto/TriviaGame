@@ -35,6 +35,7 @@ export default function Home() {
   const [dailyTrivia, setDailyTrivia] = useState<TriviaQuestion[] | null>(null)
   const [unlimitedTrivia, setUnlimitedTrivia] = useState<TriviaQuestion[] | null>(null)
   const [currMode, setCurrentMode] = useState<string>("daily")
+  const [isLoadingUnlimited, setIsLoadingUnlimited] = useState(false)
 
   const [isLoading, setIsLoading] = useState(true)
   // Loading state for API calls
@@ -263,7 +264,14 @@ export default function Home() {
         setIsLoading(false)
     }
   }
-
+  const handleGetNewQuestions = async () => {
+    setIsLoadingUnlimited(true)
+    await fetchUnlimitedTrivia()
+  
+    setTimeout(() => {
+      setIsLoadingUnlimited(false)
+    }, 3000)  // 3 second cooldown
+  }
 
   const handleUnlimitedAnswerSubmit = async (questionId: string, userAnswer: string, userId: string): Promise<SubmissionResult> => {
     try {
@@ -429,8 +437,12 @@ export default function Home() {
             <button onClick={() => {setCurrentMode("daily")}}>
               Back to Daily
             </button>
-            <button onClick={() => {fetchUnlimitedTrivia()}}>
-              Get New Questions
+            <button 
+              onClick={handleGetNewQuestions}
+              disabled={isLoadingUnlimited}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {isLoadingUnlimited ? 'Please Wait...' : 'Get New Questions'}
             </button>
           </>
           )}
