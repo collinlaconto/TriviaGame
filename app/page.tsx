@@ -4,13 +4,11 @@
 
 import { useState, useEffect } from 'react'
 // React hooks
-import DailyTrivia from '@/components/DailyTrivia'
+import TriviaQuestionList from '@/components/TriviaQuestionList'
 // Component that displays the daily trivia questions
 import ProgressStats from '@/components/ProgressStats'
 // Component that shows user progress information
-import CompletionModal from '@/components/CompletionModal'
-// Modal showed when all questions have been answered
-import { DailyTrivia as DailyTriviaType, SubmissionResult, ProgressStats as ProgressStatsType, TriviaQuestion } from '@/types'
+import { SubmissionResult, ProgressStats as ProgressStatsType, TriviaQuestion } from '@/types'
 // Typescript type definitions
 import { createClient } from '@/lib/supabase/client'
 // Supabase client for database operations
@@ -34,9 +32,11 @@ export default function Home() {
 
   // State management
   
-  const [dailyTrivia, setDailyTrivia] = useState<DailyTriviaType | null>(null)
-  // Today's trivia data
-  // Will be null if not properly loaded
+  const [dailyTrivia, setDailyTrivia] = useState<TriviaQuestion[] | null>(null)
+  const [unlimitedTrivia, setUnlimitedTrivia] = useState<TriviaQuestion[] | null>(null)
+  const [currMode, setCurrentMode] = useState<string>("daily")
+  const [isLoadingUnlimited, setIsLoadingUnlimited] = useState(false)
+
   const [isLoading, setIsLoading] = useState(true)
   // Loading state for API calls
   const [error, setError] = useState<string | null>(null)
@@ -144,13 +144,7 @@ export default function Home() {
         // If not submission, returns orignal question without progress data
       })
 
-      setDailyTrivia({
-        // Update the state with the transformed data
-        date: dailyGame.game_date,
-        // Today's date
-        questions: questionsWithProgress
-        // Questions with user progress
-      })
+      setDailyTrivia(questionsWithProgress)
 
     } catch (error: any) {
       console.error('Error in fetchDailyTrivia:', error)
@@ -193,12 +187,12 @@ export default function Home() {
         return normalized
       }
 
-function answersMatch(userAnswer: string, correctAnswer: string): boolean {
-  return normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer)
-}
+      function answersMatch(userAnswer: string, correctAnswer: string): boolean {
+        return normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer)
+      }
 
-// Then in handleAnswerSubmit, use:
-const isCorrect = answersMatch(userAnswer, question.answer)
+
+      const isCorrect = answersMatch(userAnswer, question.answer)
       
       const { error: submitError } = await supabase
       // Save the user's submission to the database
@@ -222,7 +216,7 @@ const isCorrect = answersMatch(userAnswer, question.answer)
         // Update local state to reflect the new submission
         if (!prev) return null
         // If no previous state, return null
-        const updatedQuestions = prev.questions.map(q => 
+        return prev.map(q => 
           // Map through questions and update the answered one
           q.id === questionId 
             ? { 
@@ -238,15 +232,7 @@ const isCorrect = answersMatch(userAnswer, question.answer)
             : q
             // Return other questons unchanged
         )
-        
-        return {
-          ...prev,
-          // Spread previous trivia data
-          questions: updatedQuestions
-          // Replace with update questions array
-        }
       })
-
       return {
         // Return result to the calling component
         isCorrect,
@@ -260,95 +246,99 @@ const isCorrect = answersMatch(userAnswer, question.answer)
       // Re-throw for error handling in child component
     }
   }
-
-  const handlePlayAgain = async () => {
-    // Resets the game so the user can play again
+  const fetchUnlimitedTrivia = async () => {
     try {
-      const userId = getUserId()
-      // Get user ID
-      const today = new Date().toISOString().split('T')[0]
-      // Today's date
-    
-      console.log('Resetting answers for user:', userId)
-    
-      const { data: dailyGame } = await supabase
-      // Get today's question IDs to know which answers to delete
-        .from('daily_games')
-        .select(`
-          daily_questions (question_id)
-        `)
-        // Select only question IDs from the join table
-        .eq('game_date', today)
-        .single()
+        setIsLoading(true)
+        setError(null)
+        const { data: questions, error: questionError } = await supabase
+          .rpc('get_random_questions', { question_count: 12 })
 
-      if (!dailyGame) return
-      // If no game found, return
+        if (questionError) {
+          throw new Error('Failed to load trivia')
+        }
 
-      const questionIds = dailyGame.daily_questions.map((dq: any) => dq.question_id)
-      // Extract just the question IDs from the nested response
-      
-      const { error, count } = await supabase
-      // Delete all of the user's answeres for today's questions
-        .from('user_answers')
-        .delete()
-        // Delete operation
-        .eq('user_id', userId)
-        // For current user
-        .in('question_id', questionIds)
-        // For today's questions only
+        setUnlimitedTrivia(questions)
+    } catch (error: any) {
+        setError(error.message)
+    } finally {
+        setIsLoading(false)
+    }
+  }
+  const handleGetNewQuestions = async () => {
+    setIsLoadingUnlimited(true)
+    await fetchUnlimitedTrivia()
+  
+    setTimeout(() => {
+      setIsLoadingUnlimited(false)
+    }, 3000)  // 3 second cooldown
+  }
 
-      if (error) {
-        console.error('Delete error:', error)
-        throw error
-        // Re-throw to trigger catch block
-      }
+  const handleUnlimitedAnswerSubmit = async (questionId: string, userAnswer: string, userId: string): Promise<SubmissionResult> => {
+    try {
+        const { data: question, error: questionError } = await supabase
+            .from('questions')
+            .select('answer')
+            .eq('id', questionId)
+            .single()
+        if (questionError || !question) {
+            throw new Error('Question not found')
+        }
+        function normalizeAnswer(answer: string): string {
+            let normalized = answer.trim()
+            normalized = normalized.toLowerCase()
+            normalized = normalized.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            normalized = normalized.replace(/[^\w\s]/g, '')
+            normalized = normalized.replace(/^(the|a|an)\s+/i, '')
+            normalized = normalized.replace(/s$/, '')
+            normalized = normalized.replace(/\s+/g, ' ').trim()
+            return normalized
+        }
 
-      console.log(`Deleted ${count} answers`)
+        function answersMatch(userAnswer: string, correctAnswer: string): boolean {
+            return normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer)
+        }
 
-      // Reset UI state and refetch fresh data
+        const isCorrect = answersMatch(userAnswer, question.answer)
 
-      setDailyTrivia(null)
-      // Clear current trivia
-      setError(null)
-      // Clear errors
-      setIsLoading(true)
-      // Show loadng state
-      await fetchDailyTrivia()
-      // Refetch data from server
-    
-    } catch (error) {
-      console.error('Failed to reset game:', error)
-      // Fallback to client-side reset if server reset fails
-      if (dailyTrivia) {
-        // Reset progress flags in local state without server data
-        const resetQuestions = dailyTrivia.questions.map(q => ({
-          ...q,
-          // Keep all question data
-          isAnswered: false,
-          // Reset answered status
-          userAnswer: undefined,
-          // Clear user's answer
-          isCorrect: undefined
-          // Clear correctness
-        }))
-        setDailyTrivia({ ...dailyTrivia, questions: resetQuestions })
-      }
+        setUnlimitedTrivia(prev => {
+            if (!prev) return null
+            return prev.map(q =>
+                q.id === questionId
+                ? {
+                    ...q,
+                    isAnswered: true,
+                    userAnswer: userAnswer.trim(),
+                    isCorrect
+                }
+                : q
+            )
+        })
+        return {
+            isCorrect,
+            correctAnswer: isCorrect ? undefined: question.answer
+        }
+
+    } catch (error: any) {
+        setError(error.message)
+        throw new Error(error.message)
     }
   }
 
 
   const getCorrectCount = () => {
+    const triviaProgress = currMode === "daily" ? dailyTrivia : unlimitedTrivia
     // Helper function to count how many questions the user answered correctly
-    return dailyTrivia?.questions.filter(q => q.isCorrect).length || 0
+    return triviaProgress?.filter(q => q.isCorrect).length || 0
   }
 
   const getProgressStats = (): ProgressStatsType => {
+    const triviaProgress = currMode === "daily" ? dailyTrivia : unlimitedTrivia
     // Calculates and returns progress statistics for display
-    const answeredCount = dailyTrivia?.questions.filter(q => q.isAnswered).length || 0
+    const answeredCount = triviaProgress?.filter(q => q.isAnswered).length || 0
     // Answered count
     const correctCount = getCorrectCount()
     // Correct count
-    const totalQuestions = dailyTrivia?.questions.length || 0
+    const totalQuestions = triviaProgress?.length || 0
     // Total questions
 
     return {
@@ -358,7 +348,7 @@ const isCorrect = answersMatch(userAnswer, question.answer)
       // How many answers were correct
       totalQuestions,
       // Total questions available
-      date: dailyTrivia?.date || new Date().toISOString().split('T')[0]
+      date: new Date().toISOString().split('T')[0]
       // Today's date
     }
   }
@@ -382,7 +372,7 @@ const isCorrect = answersMatch(userAnswer, question.answer)
     return (
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex justify-center items-center">
         <div className="text-center">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <div className="text-red-500 text-6xl mb-4"></div>
           <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">Something went wrong</h2>
           <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
           <button
@@ -433,21 +423,63 @@ const isCorrect = answersMatch(userAnswer, question.answer)
           </div>
         )}
 
-        <DailyTrivia
-          dailyTrivia={dailyTrivia}
-          userId={userId}
-          onAnswerSubmit={handleAnswerSubmit}
-        />
+        {/* Header and mode controls */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+              {currMode === "daily" ? "Today's Questions" : "Unlimited Mode"}
+            </h2>
+    
+            <div className="flex gap-3">
+              {allAnswered && currMode === "daily" && (
+                <button 
+                  onClick={() => { 
+                    setCurrentMode("unlimited")
+                    fetchUnlimitedTrivia() 
+                  }}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                >
+                  Play Unlimited Mode
+                </button>
+              )}
+      
+              {currMode === "unlimited" && (
+                <>
+                  <button 
+                    onClick={() => setCurrentMode("daily")}
+                    className="bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                  >
+                    Back to Daily
+                  </button>
+                  <button 
+                    onClick={handleGetNewQuestions}
+                    disabled={isLoadingUnlimited}
+                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {isLoadingUnlimited ? 'Please Wait...' : 'Get New Questions'}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
 
-        <CompletionModal
-          isOpen={allAnswered}
-          correctCount={progressStats.correctCount}
-          totalQuestions={progressStats.totalQuestions}
-          onPlayAgain={handlePlayAgain}
-          onClose={() => {}}
-        />
+        {currMode === "daily" && dailyTrivia && (
+          <TriviaQuestionList
+            questions={dailyTrivia}
+            userId={userId}
+            onAnswerSubmit={handleAnswerSubmit}
+          />
+        )}
+
+        {currMode === "unlimited" && unlimitedTrivia && (
+          <TriviaQuestionList
+            questions={unlimitedTrivia}
+            userId={userId}
+            onAnswerSubmit={handleUnlimitedAnswerSubmit}
+          />
+        )}
       </div>
     </div>
-    // On close: empty function as modal does not need close in this implementation
   )
 }
