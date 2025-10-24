@@ -421,31 +421,45 @@ export default function Home() {
           </div>
         )}
 
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold">
-            {currMode === "daily" ? "Today's Questions" : "Unlimited Mode"}
-          </h2>
-  
-          {allAnswered && currMode === "daily" && (
-            <button onClick={() => {setCurrentMode("unlimited"); fetchUnlimitedTrivia()}}>
-              Play Unlimited Mode
-            </button>
-          )}
-  
-          {currMode === "unlimited" && (
-            <>
-            <button onClick={() => {setCurrentMode("daily")}}>
-              Back to Daily
-            </button>
-            <button 
-              onClick={handleGetNewQuestions}
-              disabled={isLoadingUnlimited}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
-            >
-              {isLoadingUnlimited ? 'Please Wait...' : 'Get New Questions'}
-            </button>
-          </>
-          )}
+        {/* Header and mode controls */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+              {currMode === "daily" ? "Today's Questions" : "Unlimited Mode"}
+            </h2>
+    
+            <div className="flex gap-3">
+              {allAnswered && currMode === "daily" && (
+                <button 
+                  onClick={() => { 
+                    setCurrentMode("unlimited")
+                    fetchUnlimitedTrivia() 
+                  }}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                >
+                  Play Unlimited Mode
+                </button>
+              )}
+      
+              {currMode === "unlimited" && (
+                <>
+                  <button 
+                    onClick={() => setCurrentMode("daily")}
+                    className="bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                  >
+                    Back to Daily
+                  </button>
+                  <button 
+                    onClick={handleGetNewQuestions}
+                    disabled={isLoadingUnlimited}
+                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {isLoadingUnlimited ? 'Please Wait...' : 'Get New Questions'}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
         </div>
 
         {currMode === "daily" && dailyTrivia && (
