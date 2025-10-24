@@ -326,17 +326,19 @@ export default function Home() {
 
 
   const getCorrectCount = () => {
+    const triviaProgress = currMode === "daily" ? dailyTrivia : unlimitedTrivia
     // Helper function to count how many questions the user answered correctly
-    return dailyTrivia?.filter(q => q.isCorrect).length || 0
+    return triviaProgress?.filter(q => q.isCorrect).length || 0
   }
 
   const getProgressStats = (): ProgressStatsType => {
+    const triviaProgress = currMode === "daily" ? dailyTrivia : unlimitedTrivia
     // Calculates and returns progress statistics for display
-    const answeredCount = dailyTrivia?.filter(q => q.isAnswered).length || 0
+    const answeredCount = triviaProgress?.filter(q => q.isAnswered).length || 0
     // Answered count
     const correctCount = getCorrectCount()
     // Correct count
-    const totalQuestions = dailyTrivia?.length || 0
+    const totalQuestions = triviaProgress?.length || 0
     // Total questions
 
     return {
