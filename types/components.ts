@@ -11,10 +11,3 @@ export interface TriviaQuestionProps {
   userId: string
   onAnswerSubmit: (questionId: string, userAnswer: string, userId: string) => Promise<SubmissionResult>
 }
-
-export interface CompletionModalProps {
-  isOpen: boolean
-  correctCount: number
-  totalQuestions: number
-  onClose: () => void
-}

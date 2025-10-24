@@ -8,8 +8,6 @@ import TriviaQuestionList from '@/components/TriviaQuestionList'
 // Component that displays the daily trivia questions
 import ProgressStats from '@/components/ProgressStats'
 // Component that shows user progress information
-import CompletionModal from '@/components/CompletionModal'
-// Modal showed when all questions have been answered
 import { SubmissionResult, ProgressStats as ProgressStatsType, TriviaQuestion } from '@/types'
 // Typescript type definitions
 import { createClient } from '@/lib/supabase/client'
@@ -365,7 +363,7 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex justify-center items-center">
         <div className="text-center">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <div className="text-red-500 text-6xl mb-4"></div>
           <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">Something went wrong</h2>
           <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
           <button
@@ -454,13 +452,6 @@ export default function Home() {
             onAnswerSubmit={handleUnlimitedAnswerSubmit}
           />
         )}
-
-        <CompletionModal
-          isOpen={allAnswered}
-          correctCount={progressStats.correctCount}
-          totalQuestions={progressStats.totalQuestions}
-          onClose={() => {}}
-        />
       </div>
     </div>
   )
