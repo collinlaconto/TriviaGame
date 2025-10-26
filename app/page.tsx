@@ -68,6 +68,18 @@ export default function Home() {
   }, [])
   // Empty array means this effect runs only once after initial render
 
+  useEffect(() => {
+    // Immediate scroll
+    window.scrollTo(0, 0)
+  
+    // Delayed scroll to catch late renders
+    const timer = setTimeout(() => {
+      window.scrollTo(0, 0)
+    }, 100)
+  
+    return () => clearTimeout(timer)
+  }, [dailyTrivia, unlimitedTrivia, currMode])
+
   const fetchDailyTrivia = async () => {
     // Fetches today's trivia questions and user progress from the database
     try {
