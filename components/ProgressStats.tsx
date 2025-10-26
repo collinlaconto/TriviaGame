@@ -5,12 +5,12 @@ export default function ProgressStats({ stats }: ProgressStatsProps) {
   const progressPercentage = Math.round((answeredCount / totalQuestions) * 100)
 
   return (
-    <div className="space-y-8">
+    <>
       {/* Header Stats */}
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">Goose Trivia</h1>
         <p className="text-gray-600 dark:text-gray-400">Can you answer all {totalQuestions} questions correctly?</p>
-        <div className="mt-4 flex justify-between items-center bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+        <div className="mt-4 flex justify-between items-center p-4 border-t border-gray-200 dark:border-gray-700">
           <div className="text-left">
             <p className="text-sm text-gray-500 dark:text-gray-400">Date</p>
             <p className="font-semibold text-gray-800 dark:text-gray-200">{new Date(date).toLocaleDateString()}</p>
@@ -29,7 +29,7 @@ export default function ProgressStats({ stats }: ProgressStatsProps) {
       </div>
 
       {/* Progress Bar */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+      <div className="pb-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
           <span>Your Progress</span>
           <span>{progressPercentage}%</span>
@@ -41,6 +41,6 @@ export default function ProgressStats({ stats }: ProgressStatsProps) {
           ></div>
         </div>
       </div>
-    </div>
+    </>
   )
 }

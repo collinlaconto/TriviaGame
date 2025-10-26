@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { TriviaQuestion, TriviaQuestionProps } from '@/types'
+import styles from './TriviaQuestionList.module.css'
 
 // Color palette for cards - each question gets a unique color based on its position
 const cardColors = [
@@ -73,44 +74,44 @@ export default function TriviaQuestionList({ questions, userId, onAnswerSubmit }
               key={question.id} 
               className="relative"
             >
-              {/* Category Card (Front) */}
-              {!isSelected && (
-                <button
-                  onClick={() => setSelectedQuestion(question.id)}
-                  className={`w-full h-40 ${colorClass} rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-white p-6 flex flex-col items-center justify-center cursor-pointer ${
-                    question.isAnswered ? 'opacity-50' : ''
-                  }`}
-                >
-                  <div className="text-center">
-                    <div className="text-sm font-semibold opacity-90 mb-2">
-                      Question {index + 1}
-                    </div>
-                    <div className="text-2xl font-bold">
-                      {question.category}
-                    </div>
-                  </div>
-                </button>
-              )}
-
-              {/* Question Card (Back) */}
-              {isSelected && (
-                <div className={`border-2 rounded-lg p-4 bg-white dark:bg-gray-800 shadow-lg min-h-40 flex flex-col ${
-                  question.isAnswered ? 'border-gray-300 dark:border-gray-600' : 'border-gray-300 dark:border-gray-600'
-                }`}>
-                  {/* Header with category and close button */}
-                  <div className="flex justify-between items-center mb-3">
-                    <span className={`text-xs ${colorClass} text-white px-3 py-1 rounded font-semibold ${
+              <div className={styles.cardContainer}>
+                <div className={`${styles.cardFlipper} ${isSelected ? styles.flipped : ''}`}>
+    
+                  {/* Front card - always rendered */}
+                  <button
+                    onClick={() => setSelectedQuestion(question.id)}
+                    className={`${styles.cardFace} ${styles.cardFront} w-full h-40 ${colorClass} rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-white p-6 flex flex-col items-center justify-center cursor-pointer ${
                       question.isAnswered ? 'opacity-50' : ''
-                    }`}>
-                      {question.category}
-                    </span>
-                    <button
-                      onClick={() => setSelectedQuestion(null)}
-                      className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-xl font-bold"
-                    >
-                      ×
-                    </button>
-                  </div>
+                    }`}
+                  >
+                    <div className="text-center">
+                      <div className="text-sm font-semibold opacity-90 mb-2">
+                        Question {index + 1}
+                      </div>
+                      <div className="text-2xl font-bold">
+                        {question.category}
+                      </div>
+                    </div>
+                  </button>
+    
+                  {/* Back card - always rendered */}
+                  <div className={`${styles.cardFace} ${styles.cardBack} border-2 rounded-lg p-4 bg-white dark:bg-gray-800 shadow-lg min-h-40 flex flex-col ${
+                    question.isAnswered ? 'border-gray-300 dark:border-gray-600' : 'border-gray-300 dark:border-gray-600'
+                  }`}>
+                    {/* Header with category and close button */}
+                    <div className="flex justify-between items-center mb-3">
+                      <span className={`text-xs ${colorClass} text-white px-3 py-1 rounded font-semibold ${
+                        question.isAnswered ? 'opacity-50' : ''
+                      }`}>
+                        {question.category}
+                      </span>
+                      <button
+                        onClick={() => setSelectedQuestion(null)}
+                        className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-xl font-bold"
+                      >
+                        ×
+                      </button>
+                    </div>
                   
                   {/* Question Text */}
                   <p className="text-gray-800 dark:text-gray-200 mb-4 flex-grow text-sm">
@@ -120,18 +121,22 @@ export default function TriviaQuestionList({ questions, userId, onAnswerSubmit }
                   {/* Answer Section */}
                   {question.isAnswered ? (
                     <div className="text-center py-2">
-                      <p className={`font-semibold text-lg ${
-                        question.isCorrect ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                      }`}>
-                        {question.isCorrect ? 'Correct!' : 'Incorrect'}
-                      </p>
-                      {question.userAnswer && (
-                        <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">Your answer: <span className="font-medium">{question.userAnswer}</span></p>
-                      )}
-                      {!question.isCorrect && results[question.id]?.correctAnswer && (
-                        <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">Correct answer: <span className="font-medium">{results[question.id].correctAnswer}</span></p>
-                      )}
-                    </div>
+                        <p className={`font-semibold text-lg ${
+                          question.isCorrect ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                        }`}>
+                          {question.isCorrect ? 'Correct!' : 'Incorrect'}
+                        </p>
+                        {question.userAnswer && (
+                          <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                            Your answer: <span className="font-medium">{question.userAnswer}</span>
+                          </p>
+                        )}
+                        {!question.isCorrect && results[question.id]?.correctAnswer && (
+                          <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
+                            Correct answer: <span className="font-medium">{results[question.id].correctAnswer}</span>
+                          </p>
+                        )}
+                      </div>
                   ) : (
                     <div className="flex flex-col gap-2">
                       <input
@@ -157,11 +162,13 @@ export default function TriviaQuestionList({ questions, userId, onAnswerSubmit }
                       </button>
                     </div>
                   )}
-                </div>
-              )}
-            </div>
-          )
-        })}
+                </div>  {/* ← Closes the back card div (cardFace cardBack) */}
+              </div>  {/* ← Closes cardFlipper */}
+            </div>  {/* ← Closes cardContainer */}
+          </div>
+        )
+      })}
+      
       </div>
     </div>
   )
