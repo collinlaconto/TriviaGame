@@ -1,11 +1,14 @@
 .cardContainer {
     perspective: 1000px;
+    height: 280px;
+    /* Add fixed height to container */
 }
 
 .cardFlipper {
     position: relative;
     width: 100%;
-    min-height: 160px;
+    height: 280px;
+    /* Fixed height - same for front and back */
     transition: transform 0.6s;
     transform-style: preserve-3d;
     transform-origin: center center;
@@ -14,19 +17,20 @@
 .cardFlipper.flipped {
     transform: rotateX(180deg);
     z-index: 10;
-    min-height: 320px;
 }
 
 .cardFace {
     position: absolute;
     width: 100%;
-    min-height: 160px;
+    height: 280px;
+    /* Fixed height - matches container */
     backface-visibility: hidden;
     overflow-y: auto;
+    /* Scrolls if content too tall */
 }
 
 .cardFront {
-    transform: rotateY(0deg);
+    transform: rotateX(0deg);
 }
 
 .cardBack {
