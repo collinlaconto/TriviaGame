@@ -11,7 +11,13 @@
 }
 
 .cardFlipper.flipped {
-    transform: rotateY(180deg);
+    transform: rotateX(180deg);
+    z-index: 10;
+    /* Add this - brings flipped card to front */
+    height: auto;
+    /* Add this - allows card to expand */
+    min-height: 160px;
+    /* Add this - maintains minimum height */
 }
 
 .cardFace {
@@ -26,5 +32,5 @@
 }
 
 .cardBack {
-    transform: rotateY(180deg);
+    transform: rotateX(180deg);
 }
