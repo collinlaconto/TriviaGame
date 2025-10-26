@@ -67,6 +67,10 @@ export default function Home() {
     // Fetch daily trivia when component loads
   }, [])
   // Empty array means this effect runs only once after initial render
+  
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   const fetchDailyTrivia = async () => {
     // Fetches today's trivia questions and user progress from the database
